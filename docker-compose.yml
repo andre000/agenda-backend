@@ -1,0 +1,60 @@
+version: "3.6"
+
+services:
+  db:
+    container_name: mysql
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: agenda
+    networks:
+      - agenda-net
+
+  nginx:
+    container_name: nginx
+    build: images/nginx
+    command: nginx -g "daemon off;"
+    links:
+      - php
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    networks:
+      - agenda-net
+
+  php:
+    container_name: php
+    build: images/php
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html/app/public
+    command: php-fpm
+    links:
+      - db:db
+    ports:
+      - "9000:9000"
+    depends_on:
+      - db
+    networks:
+      - agenda-net
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: agenda
+      DB_USERNAME: root
+      DB_PASSWORD: root
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - agenda-net
+
+networks:
+  agenda-net:
