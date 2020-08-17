@@ -11,6 +11,12 @@ or
 docker-compose up -d
 ```
 
+### Using composer 
+
+```sh
+docker-compose exec php composer install -d /var/www/html
+```
+
 ### Migration
 
 ```sh
